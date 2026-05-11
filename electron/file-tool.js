@@ -1,6 +1,7 @@
 // Implements Anthropic's `text_editor_20250728` tool — view / create /
 // str_replace / insert against the local filesystem. Path access is fenced
-// to the user's home directory and /tmp; everything else is refused.
+// to the user's home directory and /tmp; symlinks are dereferenced so a
+// link inside an allowed root can't escape to a denied one.
 
 const fs = require('fs/promises');
 const path = require('path');
@@ -12,13 +13,34 @@ const ALLOWED_ROOTS = [
   '/private/tmp',
 ];
 
-function assertSafePath(p) {
+async function assertSafePath(p) {
   if (typeof p !== 'string' || !p.trim()) {
     throw new Error('path is required');
   }
-  // Expand a leading ~ to the home dir.
   const expanded = p.startsWith('~') ? path.join(os.homedir(), p.slice(1)) : p;
-  const resolved = path.resolve(expanded);
+  let resolved = path.resolve(expanded);
+
+  // Dereference symlinks so a link from an allowed root can't redirect to a
+  // denied one (e.g. ~/innocent → /etc). If the target doesn't exist (a
+  // `create` operation), walk up to the deepest existing ancestor, realpath
+  // *that*, then re-attach the trailing components.
+  try {
+    resolved = await fs.realpath(resolved);
+  } catch {
+    let existing = path.dirname(resolved);
+    const trailing = [path.basename(resolved)];
+    while (existing !== path.dirname(existing)) {
+      try {
+        existing = await fs.realpath(existing);
+        break;
+      } catch {
+        trailing.unshift(path.basename(existing));
+        existing = path.dirname(existing);
+      }
+    }
+    resolved = path.join(existing, ...trailing);
+  }
+
   const allowed = ALLOWED_ROOTS.some(
     (root) => resolved === root || resolved.startsWith(root + path.sep)
   );
@@ -42,7 +64,7 @@ async function executeAction(input) {
   const command = input.command || input.action;
   switch (command) {
     case 'view': {
-      const p = assertSafePath(input.path);
+      const p = await assertSafePath(input.path);
       const stat = await fs.stat(p);
       if (stat.isDirectory()) {
         const entries = await fs.readdir(p, { withFileTypes: true });
@@ -64,14 +86,14 @@ async function executeAction(input) {
     }
 
     case 'create': {
-      const p = assertSafePath(input.path);
+      const p = await assertSafePath(input.path);
       await fs.mkdir(path.dirname(p), { recursive: true });
       await fs.writeFile(p, input.file_text ?? '', 'utf-8');
       return `Created ${p}`;
     }
 
     case 'str_replace': {
-      const p = assertSafePath(input.path);
+      const p = await assertSafePath(input.path);
       const text = await fs.readFile(p, 'utf-8');
       const oldStr = input.old_str ?? '';
       const newStr = input.new_str ?? '';
@@ -89,7 +111,7 @@ async function executeAction(input) {
     }
 
     case 'insert': {
-      const p = assertSafePath(input.path);
+      const p = await assertSafePath(input.path);
       const text = await fs.readFile(p, 'utf-8');
       const lines = text.split('\n');
       const at = Math.max(0, Math.min(Number(input.insert_line) || 0, lines.length));

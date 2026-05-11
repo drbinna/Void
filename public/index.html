@@ -482,7 +482,14 @@
       const transcript = document.getElementById("transcript");
       const msg = document.createElement("div");
       msg.className = "msg " + (role === "Zek'thar" ? "persona" : "user");
-      msg.innerHTML = `<div class="role">${role}</div><div class="text">${text}</div>`;
+      const roleEl = document.createElement("div");
+      roleEl.className = "role";
+      roleEl.textContent = role;
+      const textEl = document.createElement("div");
+      textEl.className = "text";
+      textEl.textContent = text;
+      msg.appendChild(roleEl);
+      msg.appendChild(textEl);
       transcript.appendChild(msg);
       transcript.scrollTop = transcript.scrollHeight;
     }

@@ -248,10 +248,10 @@ app.post("/api/voice/intent", async (req, res) => {
       .trim();
     const taskMatch = text.match(/^TASK:\s*(.+)$/im);
     if (taskMatch) {
-      console.log(`[intent] "${transcript.slice(0, 80)}" → TASK: ${taskMatch[1].trim()}`);
+      console.log('[intent] routed to TASK');
       return res.json({ is_task: true, goal: taskMatch[1].trim() });
     }
-    console.log(`[intent] "${transcript.slice(0, 80)}" → CHAT (raw: "${text.slice(0, 60)}")`);
+    console.log('[intent] routed to CHAT');
     res.json({ is_task: false, goal: "" });
   } catch (err) {
     console.error("voice/intent failed:", err);
@@ -259,6 +259,6 @@ app.post("/api/voice/intent", async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '127.0.0.1', () => {
   console.log(`\n  ✦ Zek'thar is ready at http://localhost:${PORT}\n`);
 });

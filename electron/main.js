@@ -75,6 +75,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
+      sandbox: true,
       preload: path.join(__dirname, 'preload.js'),
     },
   });
@@ -148,6 +149,7 @@ function openWelcome() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
+      sandbox: true,
       preload: path.join(__dirname, 'welcome-preload.js'),
     },
   });
@@ -190,6 +192,7 @@ function openTaskInput() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
+      sandbox: true,
       preload: path.join(__dirname, 'task-input-preload.js'),
     },
   });
@@ -404,7 +407,7 @@ function settleMsFor(actionName) {
 
 async function chat(transcript) {
   try {
-    console.log('[chat] called, transcript:', transcript ? `"${transcript}"` : '<no transcript>');
+    console.log('[chat] called', transcript ? '(with transcript)' : '(no transcript)');
     const shots = await capture.snapshot();
     console.log('[chat] snapshot returned', shots.length, 'shot(s)');
     if (shots.length === 0) {
@@ -540,7 +543,7 @@ app.whenReady().then(async () => {
   loadHistory();
 
   // Auto-grant media (mic / camera / display) permissions to our renderer.
-  session.defaultSession.setPermissionRequestHandler((wc, permission, callback) => {
+  session.defaultSession.setPermissionRequestHandler((_wc, permission, callback) => {
     const allow = ['media', 'mediaKeySystem', 'display-capture', 'microphone'].includes(permission);
     callback(allow);
   });

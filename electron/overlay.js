@@ -21,6 +21,7 @@ function createOverlayForDisplay(display) {
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
+      sandbox: true,
       preload: path.join(__dirname, 'overlay-preload.js'),
     },
   });
