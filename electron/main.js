@@ -15,7 +15,27 @@ try {
 }
 const fileTool = require('./file-tool');
 
-const SERVER_URL = process.env.ZEKTHAR_SERVER_URL || 'http://localhost:3000';
+// ─── Embedded server bootstrap ────────────────────────
+// In the packaged app, resources live inside app.asar. The server and its
+// .env sit at the app root (one level above electron/).
+const APP_ROOT = path.join(__dirname, '..');
+
+// Load .env from the app root (or from userData for user-configured keys).
+const dotenv = require('dotenv');
+const userEnvPath = path.join(app.getPath('userData'), '.env');
+const bundledEnvPath = path.join(APP_ROOT, '.env');
+if (fs.existsSync(userEnvPath)) {
+  dotenv.config({ path: userEnvPath });
+  console.log('[boot] loaded .env from', userEnvPath);
+} else if (fs.existsSync(bundledEnvPath)) {
+  dotenv.config({ path: bundledEnvPath });
+  console.log('[boot] loaded .env from', bundledEnvPath);
+} else {
+  console.warn('[boot] no .env found — set API keys via', userEnvPath);
+}
+
+const SERVER_PORT = process.env.PORT || 3000;
+const SERVER_URL = process.env.ZEKTHAR_SERVER_URL || `http://localhost:${SERVER_PORT}`;
 const HISTORY_LIMIT = 20; // last 10 exchanges (user+assistant)
 // Flip this on once Zek'thar can actually click. For now the pointer is
 // decorative and tends to stick around after a capture.
@@ -539,6 +559,18 @@ ipcMain.on('anam:history', (_e, messages) => {
 });
 
 app.whenReady().then(async () => {
+  // ─── Start embedded Express server ───────────────────
+  // Skip if an external server URL was explicitly set (dev mode).
+  if (!process.env.ZEKTHAR_SERVER_URL) {
+    try {
+      const server = require(path.join(APP_ROOT, 'server.js'));
+      await server.start(SERVER_PORT);
+      console.log('[boot] embedded server started on port', SERVER_PORT);
+    } catch (err) {
+      console.error('[boot] failed to start embedded server:', err);
+    }
+  }
+
   HISTORY_FILE = path.join(app.getPath('userData'), 'history.json');
   loadHistory();
 

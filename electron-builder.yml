@@ -1,0 +1,66 @@
+appId: com.zekthar.desktop
+productName: "Zek'thar"
+copyright: "Copyright © 2026"
+
+directories:
+  output: dist
+  buildResources: build
+
+# Files to include in the app bundle (relative to project root).
+files:
+  - "electron/**/*"
+  - "server.js"
+  - "public/**/*"
+  - "package.json"
+  - "!**/node_modules/*/{CHANGELOG.md,README.md,readme.md,README,readme}"
+  - "!**/node_modules/.cache"
+  - "!**/*.map"
+
+# Native modules that need rebuilding for Electron.
+npmRebuild: true
+
+mac:
+  target:
+    - target: dmg
+      arch:
+        - arm64
+        - x64
+    - target: zip
+      arch:
+        - arm64
+        - x64
+  category: public.app-category.utilities
+  icon: build/icon.png
+  darkModeSupport: true
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.inherit.plist
+
+  # Code signing identity. electron-builder finds it automatically from your
+  # keychain when building locally. For CI, set CSC_LINK and CSC_KEY_PASSWORD
+  # environment variables (see .github/workflows/release.yml).
+  identity: null  # auto-detect from keychain / CSC_LINK
+
+  # Notarization — requires APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD, and
+  # APPLE_TEAM_ID environment variables.
+  notarize:
+    teamId: ${env.APPLE_TEAM_ID}
+
+  # Extended attributes needed for screen recording and accessibility.
+  extendInfo:
+    NSMicrophoneUsageDescription: "Zek'thar needs microphone access for voice conversation."
+    NSScreenCaptureUsageDescription: "Zek'thar needs screen recording to see what you're working on."
+    NSAppleEventsUsageDescription: "Zek'thar needs automation access to perform tasks on your behalf."
+
+dmg:
+  title: "Zek'thar"
+  artifactName: "Zekthar-${version}-${arch}.${ext}"
+
+# Extra resources that are unpacked outside the asar (needed for native modules).
+asarUnpack:
+  - "node_modules/@nut-tree-fork/**"
+  - "node_modules/node-gyp-build/**"
+
+# Don't bundle dev dependencies.
+buildDependenciesFromSource: false

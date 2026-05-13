@@ -1,12 +1,10 @@
-import dotenv from "dotenv";
-import express from "express";
-import cors from "cors";
-import Anthropic from "@anthropic-ai/sdk";
-import { fileURLToPath } from "url";
-import { dirname, join } from "path";
+const dotenv = require("dotenv");
+const express = require("express");
+const cors = require("cors");
+const Anthropic = require("@anthropic-ai/sdk").default || require("@anthropic-ai/sdk");
+const path = require("path");
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-dotenv.config({ path: join(__dirname, ".env") });
+dotenv.config({ path: path.join(__dirname, ".env") });
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -14,7 +12,7 @@ const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 app.use(cors());
 app.use(express.json({ limit: "25mb" }));
-app.use(express.static(join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "public")));
 
 // ─────────────────────────────────────────────
 // POST /api/session — Anam session token
@@ -259,6 +257,19 @@ app.post("/api/voice/intent", async (req, res) => {
   }
 });
 
-app.listen(PORT, '127.0.0.1', () => {
-  console.log(`\n  ✦ Zek'thar is ready at http://localhost:${PORT}\n`);
-});
+function start(port) {
+  const p = port || PORT;
+  return new Promise((resolve) => {
+    const server = app.listen(p, '127.0.0.1', () => {
+      console.log(`\n  ✦ Zek'thar is ready at http://localhost:${p}\n`);
+      resolve(server);
+    });
+  });
+}
+
+// Run standalone when executed directly
+if (require.main === module) {
+  start();
+}
+
+module.exports = { app, start };
