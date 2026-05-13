@@ -1,5 +1,5 @@
 appId: com.zekthar.desktop
-productName: "Zek'thar"
+productName: Zekthar
 copyright: "Copyright © 2026"
 
 directories:
@@ -40,7 +40,6 @@ mac:
   # Code signing identity. electron-builder finds it automatically from your
   # keychain when building locally. For CI, set CSC_LINK and CSC_KEY_PASSWORD
   # environment variables (see .github/workflows/release.yml).
-  identity: null  # auto-detect from keychain / CSC_LINK
 
   # Notarization — requires APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD, and
   # APPLE_TEAM_ID environment variables.
@@ -49,12 +48,12 @@ mac:
 
   # Extended attributes needed for screen recording and accessibility.
   extendInfo:
-    NSMicrophoneUsageDescription: "Zek'thar needs microphone access for voice conversation."
-    NSScreenCaptureUsageDescription: "Zek'thar needs screen recording to see what you're working on."
-    NSAppleEventsUsageDescription: "Zek'thar needs automation access to perform tasks on your behalf."
+    NSMicrophoneUsageDescription: "Zekthar needs microphone access for voice conversation."
+    NSScreenCaptureUsageDescription: "Zekthar needs screen recording to see what you're working on."
+    NSAppleEventsUsageDescription: "Zekthar needs automation access to perform tasks on your behalf."
 
 dmg:
-  title: "Zek'thar"
+  title: Zekthar
   artifactName: "Zekthar-${version}-${arch}.${ext}"
 
 # Extra resources that are unpacked outside the asar (needed for native modules).
