@@ -57,6 +57,14 @@ dmg:
   title: Zekthar
   artifactName: "Zekthar-${version}-${arch}.${ext}"
 
+# Publish config — generates latest-mac.yml and tells electron-updater
+# where to look for new versions.
+publish:
+  - provider: github
+    owner: drbinna
+    repo: Void
+    releaseType: release
+
 # Extra resources that are unpacked outside the asar (needed for native modules).
 asarUnpack:
   - "node_modules/@nut-tree-fork/**"

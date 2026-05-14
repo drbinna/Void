@@ -14,6 +14,7 @@ try {
   console.warn('[task] actuator unavailable (run npm install in electron/ to enable):', err.message);
 }
 const fileTool = require('./file-tool');
+const updater = require('./updater');
 
 // ─── Embedded server bootstrap ────────────────────────
 // In the packaged app, resources live inside app.asar. The server and its
@@ -494,6 +495,11 @@ ipcMain.handle('chat', async (_e, transcript) => chat(transcript));
 
 ipcMain.handle('get-server-url', () => SERVER_URL);
 
+ipcMain.handle('check-for-updates', async () => {
+  await updater.check();
+  return { updateAvailable: updater.isUpdateAvailable() };
+});
+
 ipcMain.handle('get-session-token', async () => {
   try {
     const response = await fetch(`${SERVER_URL}/api/session`, {
@@ -576,6 +582,9 @@ app.whenReady().then(async () => {
 
   HISTORY_FILE = path.join(app.getPath('userData'), 'history.json');
   loadHistory();
+
+  // Start checking for updates (no-op in dev mode)
+  updater.init();
 
   // Auto-grant media (mic / camera / display) permissions to our renderer.
   session.defaultSession.setPermissionRequestHandler((_wc, permission, callback) => {

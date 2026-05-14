@@ -4,6 +4,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Server URL (may differ from default if port 3000 was busy)
   getServerUrl: () => ipcRenderer.invoke('get-server-url'),
 
+  // Manually check for updates (auto-update runs on its own; this is for menu items)
+  checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+
   // Anam session token (renderer fetches via main → server)
   getSessionToken: () => ipcRenderer.invoke('get-session-token'),
 
