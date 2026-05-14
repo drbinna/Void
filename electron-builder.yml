@@ -41,11 +41,9 @@ mac:
   # keychain when building locally. For CI, set CSC_LINK and CSC_KEY_PASSWORD
   # environment variables (see .github/workflows/release.yml).
 
-  # Notarization — requires APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD, and APPLE_TEAM_ID
-  # environment variables. electron-builder uses Apple's notarytool to submit
-  # the signed app, wait for approval, then staple the ticket to the .dmg.
-  notarize:
-    teamId: ${env.APPLE_TEAM_ID}
+  # Notarization — set to true to enable. electron-builder reads APPLE_ID,
+  # APPLE_APP_SPECIFIC_PASSWORD, and APPLE_TEAM_ID from the environment.
+  notarize: true
 
   # Extended attributes needed for screen recording and accessibility.
   extendInfo:
