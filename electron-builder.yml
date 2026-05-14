@@ -41,9 +41,14 @@ mac:
   # keychain when building locally. For CI, set CSC_LINK and CSC_KEY_PASSWORD
   # environment variables (see .github/workflows/release.yml).
 
-  # Notarization — set to true to enable. electron-builder reads APPLE_ID,
-  # APPLE_APP_SPECIFIC_PASSWORD, and APPLE_TEAM_ID from the environment.
-  notarize: true
+  # Notarization — temporarily disabled. Apple's notarytool service has been
+  # returning HTTP 500 errors. Will re-enable once it stabilizes. To notarize
+  # an already-built .dmg manually:
+  #   xcrun notarytool submit dist/Zekthar-X.Y.Z-arm64.dmg \
+  #     --apple-id "$APPLE_ID" --password "$APPLE_APP_SPECIFIC_PASSWORD" \
+  #     --team-id "$APPLE_TEAM_ID" --wait
+  #   xcrun stapler staple dist/Zekthar-X.Y.Z-arm64.dmg
+  notarize: false
 
   # Extended attributes needed for screen recording and accessibility.
   extendInfo:
