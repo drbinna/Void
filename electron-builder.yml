@@ -48,7 +48,7 @@ mac:
   #     --apple-id "$APPLE_ID" --password "$APPLE_APP_SPECIFIC_PASSWORD" \
   #     --team-id "$APPLE_TEAM_ID" --wait
   #   xcrun stapler staple dist/Zekthar-X.Y.Z-arm64.dmg
-  notarize: false
+  notarize: true
 
   # Extended attributes needed for screen recording and accessibility.
   extendInfo:

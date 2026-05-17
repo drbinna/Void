@@ -3,6 +3,10 @@
 <plist version="1.0">
 <dict>
     <!-- Allow unsigned code (for dev builds without Apple Developer ID) -->
+    <!-- JIT required by V8/Electron on Apple Silicon -->
+    <key>com.apple.security.cs.allow-jit</key>
+    <true/>
+
     <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
     <true/>
 
