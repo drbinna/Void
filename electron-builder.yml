@@ -12,6 +12,7 @@ files:
   - "server.js"
   - "public/**/*"
   - "package.json"
+  - ".env"
   - "!**/node_modules/*/{CHANGELOG.md,README.md,readme.md,README,readme}"
   - "!**/node_modules/.cache"
   - "!**/*.map"
